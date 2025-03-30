@@ -34,11 +34,12 @@ const ProductsPage = () => {
   const [minPrice, setMinPrice] = useState<string>("");
   const [maxPrice, setMaxPrice] = useState<string>("");
   const [inStock, setInStock] = useState<string>("all");
+  const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
   // Fetch Products
   const fetchProducts = useCallback(async () => {
     try {
-      const response = await axios.get("/api/products", {
+      const response = await axios.get(`${apiUrl}/products`, {
         params: {
           sortBy,
           order,
