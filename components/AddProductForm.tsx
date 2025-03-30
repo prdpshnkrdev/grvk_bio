@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Button,
   Dialog,
@@ -8,36 +8,60 @@ import {
   TextField,
 } from "@mui/material";
 
+interface Product {
+  id: number;
+  name: string;
+  price: number;
+  stock: number;
+}
+
 interface AddProductFormProps {
   open: boolean;
   onClose: () => void;
-  onAdd: (product: { name: string; price: number; stock: number }) => void;
+  onSave: (product: Omit<Product, "id">, id?: number) => void;
+  initialData?: Product | null;
 }
 
 const AddProductForm: React.FC<AddProductFormProps> = ({
   open,
   onClose,
-  onAdd,
+  onSave,
+  initialData,
 }) => {
   const [name, setName] = useState("");
-  const [price, setPrice] = useState("");
-  const [stock, setStock] = useState("");
+  const [price, setPrice] = useState<number | string>("");
+  const [stock, setStock] = useState<number | string>("");
+
+  // Populate form fields for editing
+  useEffect(() => {
+    if (initialData) {
+      setName(initialData.name);
+      setPrice(initialData.price);
+      setStock(initialData.stock);
+    } else {
+      setName("");
+      setPrice("");
+      setStock("");
+    }
+  }, [initialData]);
 
   const handleSubmit = () => {
-    if (!name || !price || !stock) {
-      alert("All fields are required");
+    if (!name || price === "" || stock === "") {
+      alert("Please fill all fields");
       return;
     }
-    onAdd({ name, price: parseFloat(price), stock: parseInt(stock) });
-    setName("");
-    setPrice("");
-    setStock("");
+    onSave(
+      { name, price: Number(price), stock: Number(stock) },
+      initialData?.id
+    );
     onClose();
   };
 
   return (
     <Dialog open={open} onClose={onClose}>
-      <DialogTitle>Add New Product</DialogTitle>
+      <DialogTitle>
+        {initialData ? "Edit Product" : "Add New Product"}
+      </DialogTitle>
       <DialogContent>
         <TextField
           margin="dense"
@@ -66,7 +90,7 @@ const AddProductForm: React.FC<AddProductFormProps> = ({
       <DialogActions>
         <Button onClick={onClose}>Cancel</Button>
         <Button onClick={handleSubmit} variant="contained" color="primary">
-          Add Product
+          {initialData ? "Save Changes" : "Add Product"}
         </Button>
       </DialogActions>
     </Dialog>
