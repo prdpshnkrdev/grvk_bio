@@ -3,13 +3,7 @@ import React, { useState } from "react";
 import { Button, Container, Typography } from "@mui/material";
 import AddProductForm from "../../components/AddProductForm";
 import ProductTable from "../../components/ProductTable";
-
-interface Product {
-  id: number;
-  name: string;
-  price: number;
-  stock: number;
-}
+import DashboardLayout from "../../layouts/DashboardLayout";
 
 const ProductsPage = () => {
   const [open, setOpen] = useState(false);
@@ -18,26 +12,35 @@ const ProductsPage = () => {
     { id: 2, name: "Product 2", price: 200, stock: 30 },
   ]);
 
-  const handleAddProduct = (newProduct: Omit<Product, "id">) => {
-    setProducts([...products, { ...newProduct, id: products.length + 1 }]);
+  const handleAddProduct = (newProduct: Omit<(typeof products)[0], "id">) => {
+    setProducts((prevProducts) => [
+      ...prevProducts,
+      { ...newProduct, id: prevProducts.length + 1 },
+    ]);
     setOpen(false);
   };
 
   return (
-    <Container>
-      <Typography variant="h4" gutterBottom>
-        Products Management
-      </Typography>
-      <Button variant="contained" color="primary" onClick={() => setOpen(true)}>
-        Add Product
-      </Button>
-      <ProductTable products={products} setProducts={setProducts} />
-      <AddProductForm
-        open={open}
-        onClose={() => setOpen(false)}
-        onAdd={handleAddProduct}
-      />
-    </Container>
+    <DashboardLayout>
+      <Container>
+        <Typography variant="h4" gutterBottom>
+          Products Management
+        </Typography>
+        <Button
+          variant="contained"
+          color="primary"
+          onClick={() => setOpen(true)}
+        >
+          Add Product
+        </Button>
+        <ProductTable products={products} setProducts={setProducts} />
+        <AddProductForm
+          open={open}
+          onClose={() => setOpen(false)}
+          onAdd={handleAddProduct}
+        />
+      </Container>
+    </DashboardLayout>
   );
 };
 
