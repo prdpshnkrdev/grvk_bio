@@ -1,25 +1,26 @@
-// pages/api/products/index.ts
+import dbConnect from "../../../lib/mongodb";
 import { NextApiRequest, NextApiResponse } from "next";
+import Product, { IProduct } from "../../../models/Products";
 
-const products = [
-  { id: 1, name: "Product 1", price: 100, stock: 50 },
-  { id: 2, name: "Product 2", price: 200, stock: 30 },
-];
+// Connect to MongoDB
+dbConnect();
 
-export default function handler(req: NextApiRequest, res: NextApiResponse) {
+export default async function handler(
+  req: NextApiRequest,
+  res: NextApiResponse
+) {
   if (req.method === "GET") {
+    const products: IProduct[] = await Product.find({});
     res.status(200).json(products);
   } else if (req.method === "POST") {
     const { name, price, stock } = req.body;
-    const newProduct = {
-      id: products.length + 1,
-      name,
-      price,
-      stock,
-    };
-    products.push(newProduct);
+    if (!name || price === undefined || stock === undefined) {
+      return res.status(400).json({ error: "Missing required fields" });
+    }
+    const newProduct = new Product({ name, price, stock });
+    await newProduct.save();
     res.status(201).json(newProduct);
   } else {
-    res.status(405).json({ message: "Method Not Allowed" });
+    res.status(405).json({ error: "Method not allowed" });
   }
 }

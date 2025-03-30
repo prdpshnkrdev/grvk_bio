@@ -1,3 +1,4 @@
+// components/ProductTable.tsx
 import React from "react";
 import {
   Table,
@@ -11,7 +12,7 @@ import {
 } from "@mui/material";
 
 interface Product {
-  id: number;
+  id: string;
   name: string;
   price: number;
   stock: number;
@@ -20,7 +21,7 @@ interface Product {
 interface ProductTableProps {
   products: Product[];
   onEdit: (product: Product) => void;
-  onDelete: (productId: number) => void;
+  onDelete: (productId: string) => void;
 }
 
 const ProductTable: React.FC<ProductTableProps> = ({
@@ -41,22 +42,30 @@ const ProductTable: React.FC<ProductTableProps> = ({
           </TableRow>
         </TableHead>
         <TableBody>
-          {products.map((product) => (
-            <TableRow key={product.id}>
-              <TableCell>{product.id}</TableCell>
-              <TableCell>{product.name}</TableCell>
-              <TableCell>{product.price}</TableCell>
-              <TableCell>{product.stock}</TableCell>
-              <TableCell>
-                <Button onClick={() => onEdit(product)} color="primary">
-                  Edit
-                </Button>
-                <Button onClick={() => onDelete(product.id)} color="error">
-                  Delete
-                </Button>
+          {products.length > 0 ? (
+            products.map((product) => (
+              <TableRow key={product.id}>
+                <TableCell>{product.id}</TableCell>
+                <TableCell>{product.name}</TableCell>
+                <TableCell>${product.price}</TableCell>
+                <TableCell>{product.stock}</TableCell>
+                <TableCell>
+                  <Button onClick={() => onEdit(product)} color="primary">
+                    Edit
+                  </Button>
+                  <Button onClick={() => onDelete(product.id)} color="error">
+                    Delete
+                  </Button>
+                </TableCell>
+              </TableRow>
+            ))
+          ) : (
+            <TableRow>
+              <TableCell colSpan={5} align="center">
+                No Products Found
               </TableCell>
             </TableRow>
-          ))}
+          )}
         </TableBody>
       </Table>
     </TableContainer>

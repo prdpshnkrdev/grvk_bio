@@ -9,7 +9,7 @@ import {
 } from "@mui/material";
 
 interface Product {
-  id: number;
+  id: string;
   name: string;
   price: number;
   stock: number;
@@ -18,7 +18,7 @@ interface Product {
 interface AddProductFormProps {
   open: boolean;
   onClose: () => void;
-  onSave: (product: Omit<Product, "id">, id?: number) => void;
+  onSave: (product: Omit<Product, "id">, id?: string) => void;
   initialData?: Product | null;
 }
 
@@ -32,7 +32,6 @@ const AddProductForm: React.FC<AddProductFormProps> = ({
   const [price, setPrice] = useState<number | string>("");
   const [stock, setStock] = useState<number | string>("");
 
-  // Populate form fields for editing
   useEffect(() => {
     if (initialData) {
       setName(initialData.name);

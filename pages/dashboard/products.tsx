@@ -6,7 +6,7 @@ import ProductTable from "../../components/ProductTable";
 import DashboardLayout from "../../layouts/DashboardLayout";
 
 interface Product {
-  id: number;
+  id: string;
   name: string;
   price: number;
   stock: number;
@@ -34,7 +34,7 @@ const ProductsPage = () => {
   // Add or Edit Product
   const handleSaveProduct = async (
     productData: Omit<Product, "id">,
-    productId?: number
+    productId?: string
   ) => {
     try {
       if (productId) {
@@ -51,7 +51,9 @@ const ProductsPage = () => {
   };
 
   // Delete Product
-  const handleDeleteProduct = async (productId: number) => {
+  const handleDeleteProduct = async (productId: string) => {
+    if (!window.confirm("Are you sure you want to delete this product?"))
+      return;
     try {
       await axios.delete(`/api/products/${productId}`);
       fetchProducts();
