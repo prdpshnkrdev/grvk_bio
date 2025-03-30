@@ -1,6 +1,6 @@
-// pages/api/orders/[id].ts
-import dbConnect from "../../../../lib/mongodb";
-import Order, { IOrder, OrderStatus } from "../../../../models/Orders";
+import mongoose from "mongoose";
+import dbConnect from "../../../lib/mongodb";
+import Order, { IOrder, OrderStatus } from "../../../models/Orders";
 import { NextApiRequest, NextApiResponse } from "next";
 
 // Connect to MongoDB
@@ -12,10 +12,9 @@ export default async function handler(
 ) {
   const { id } = req.query;
 
-  if (!id) {
-    return res.status(400).json({ error: "Order ID is required" });
+  if (id && !mongoose.Types.ObjectId.isValid(id as string)) {
+    return res.status(400).json({ error: "Invalid Order ID" });
   }
-
   try {
     switch (req.method) {
       // Get Order by ID

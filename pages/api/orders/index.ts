@@ -1,7 +1,7 @@
-// pages/api/orders/index.ts
-import dbConnect from "../../../../lib/mongodb"; // Adjust the import path as necessary
-import Order, { IOrder, OrderStatus } from "../../../../models/Orders";
-import Product from "../../../../models/Products"; // Adjust the import path as necessary
+import mongoose from "mongoose";
+import dbConnect from "../../../lib/mongodb"; // Adjust the import path as necessary
+import Order, { IOrder, OrderStatus } from "../../../models/Orders";
+import Product from "../../../models/Products"; // Adjust the import path as necessary
 import { NextApiRequest, NextApiResponse } from "next";
 
 // Connect to MongoDB
@@ -11,6 +11,12 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
+  const { id } = req.query;
+
+  // Validate ID for GET, PUT, DELETE requests
+  if (id && !mongoose.Types.ObjectId.isValid(id as string)) {
+    return res.status(400).json({ error: "Invalid Order ID" });
+  }
   try {
     switch (req.method) {
       // Get All Orders
