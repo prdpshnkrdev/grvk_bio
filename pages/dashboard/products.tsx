@@ -1,15 +1,6 @@
-import React, { useState } from "react";
-import {
-  Button,
-  Container,
-  Typography,
-  Box,
-  TextField,
-  Select,
-  MenuItem,
-  FormControl,
-  InputLabel,
-} from "@mui/material";
+import React, { useState, useEffect } from "react";
+import { Button, Container, Typography } from "@mui/material";
+import axios from "axios";
 import AddProductForm from "../../components/AddProductForm";
 import ProductTable from "../../components/ProductTable";
 import DashboardLayout from "../../layouts/DashboardLayout";
@@ -24,32 +15,49 @@ interface Product {
 const ProductsPage = () => {
   const [open, setOpen] = useState(false);
   const [editProduct, setEditProduct] = useState<Product | null>(null);
-  const [products, setProducts] = useState<Product[]>([
-    { id: 1, name: "Product 1", price: 100, stock: 50 },
-    { id: 2, name: "Product 2", price: 200, stock: 30 },
-    { id: 3, name: "Product 3", price: 150, stock: 10 },
-  ]);
+  const [products, setProducts] = useState<Product[]>([]);
 
-  const [searchQuery, setSearchQuery] = useState("");
-  const [filter, setFilter] = useState<string>("All");
+  // Fetch Products
+  const fetchProducts = async () => {
+    try {
+      const response = await axios.get("/api/products");
+      setProducts(response.data);
+    } catch (error) {
+      console.error("Error fetching products:", error);
+    }
+  };
 
-  const handleSaveProduct = (
+  useEffect(() => {
+    fetchProducts();
+  }, []);
+
+  // Add or Edit Product
+  const handleSaveProduct = async (
     productData: Omit<Product, "id">,
     productId?: number
   ) => {
-    if (productId) {
-      const updatedProducts = products.map((product) =>
-        product.id === productId ? { ...product, ...productData } : product
-      );
-      setProducts(updatedProducts);
-    } else {
-      setProducts((prevProducts) => [
-        ...prevProducts,
-        { ...productData, id: prevProducts.length + 1 },
-      ]);
+    try {
+      if (productId) {
+        await axios.put(`/api/products/${productId}`, productData);
+      } else {
+        await axios.post("/api/products", productData);
+      }
+      fetchProducts();
+    } catch (error) {
+      console.error("Error saving product:", error);
     }
     setOpen(false);
     setEditProduct(null);
+  };
+
+  // Delete Product
+  const handleDeleteProduct = async (productId: number) => {
+    try {
+      await axios.delete(`/api/products/${productId}`);
+      fetchProducts();
+    } catch (error) {
+      console.error("Error deleting product:", error);
+    }
   };
 
   const handleEdit = (product: Product) => {
@@ -57,55 +65,23 @@ const ProductsPage = () => {
     setOpen(true);
   };
 
-  // Search and Filter Logic
-  const filteredProducts = products.filter((product) => {
-    const matchesSearch = product.name
-      .toLowerCase()
-      .includes(searchQuery.toLowerCase());
-    const matchesFilter =
-      filter === "All" ||
-      (filter === "In Stock" && product.stock > 0) ||
-      (filter === "Out of Stock" && product.stock === 0);
-    return matchesSearch && matchesFilter;
-  });
-
   return (
     <DashboardLayout>
       <Container>
         <Typography variant="h4" gutterBottom>
           Products Management
         </Typography>
-
-        {/* Search and Filter Section */}
-        <Box display="flex" gap={2} marginBottom={2}>
-          <TextField
-            label="Search Products"
-            variant="outlined"
-            size="small"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-          />
-          <FormControl size="small">
-            <InputLabel>Filter</InputLabel>
-            <Select value={filter} onChange={(e) => setFilter(e.target.value)}>
-              <MenuItem value="All">All</MenuItem>
-              <MenuItem value="In Stock">In Stock</MenuItem>
-              <MenuItem value="Out of Stock">Out of Stock</MenuItem>
-            </Select>
-          </FormControl>
-          <Button
-            variant="contained"
-            color="primary"
-            onClick={() => setOpen(true)}
-          >
-            Add Product
-          </Button>
-        </Box>
-
+        <Button
+          variant="contained"
+          color="primary"
+          onClick={() => setOpen(true)}
+        >
+          Add Product
+        </Button>
         <ProductTable
-          products={filteredProducts}
-          setProducts={setProducts}
+          products={products}
           onEdit={handleEdit}
+          onDelete={handleDeleteProduct}
         />
         <AddProductForm
           open={open}
