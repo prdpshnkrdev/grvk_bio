@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import {
   Table,
   TableBody,
@@ -7,10 +7,8 @@ import {
   TableHead,
   TableRow,
   Paper,
-  IconButton,
+  Button,
 } from "@mui/material";
-import EditIcon from "@mui/icons-material/Edit";
-import DeleteIcon from "@mui/icons-material/Delete";
 
 interface Product {
   id: number;
@@ -19,23 +17,18 @@ interface Product {
   stock: number;
 }
 
-const initialProducts: Product[] = [
-  { id: 1, name: "Product 1", price: 100, stock: 20 },
-  { id: 2, name: "Product 2", price: 150, stock: 35 },
-  { id: 3, name: "Product 3", price: 200, stock: 10 },
-];
+interface ProductTableProps {
+  products: Product[];
+  setProducts: React.Dispatch<React.SetStateAction<Product[]>>;
+}
 
-const ProductTable: React.FC = () => {
-  const [products, setProducts] = useState<Product[]>(initialProducts);
-
-  const handleEdit = (id: number) => {
-    alert(`Edit product with ID: ${id}`);
-  };
-
+const ProductTable: React.FC<ProductTableProps> = ({
+  products,
+  setProducts,
+}) => {
   const handleDelete = (id: number) => {
-    setProducts((prevProducts) =>
-      prevProducts.filter((product) => product.id !== id)
-    );
+    const updatedProducts = products.filter((product) => product.id !== id);
+    setProducts(updatedProducts);
   };
 
   return (
@@ -43,8 +36,9 @@ const ProductTable: React.FC = () => {
       <Table>
         <TableHead>
           <TableRow>
-            <TableCell>Product Name</TableCell>
-            <TableCell>Price ($)</TableCell>
+            <TableCell>ID</TableCell>
+            <TableCell>Name</TableCell>
+            <TableCell>Price</TableCell>
             <TableCell>Stock</TableCell>
             <TableCell>Actions</TableCell>
           </TableRow>
@@ -52,16 +46,14 @@ const ProductTable: React.FC = () => {
         <TableBody>
           {products.map((product) => (
             <TableRow key={product.id}>
+              <TableCell>{product.id}</TableCell>
               <TableCell>{product.name}</TableCell>
               <TableCell>{product.price}</TableCell>
               <TableCell>{product.stock}</TableCell>
               <TableCell>
-                <IconButton onClick={() => handleEdit(product.id)}>
-                  <EditIcon />
-                </IconButton>
-                <IconButton onClick={() => handleDelete(product.id)}>
-                  <DeleteIcon />
-                </IconButton>
+                <Button onClick={() => handleDelete(product.id)} color="error">
+                  Delete
+                </Button>
               </TableCell>
             </TableRow>
           ))}
