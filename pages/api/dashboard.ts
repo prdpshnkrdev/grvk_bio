@@ -31,6 +31,44 @@ export default async function handler(
       status: OrderStatus.Pending,
     });
 
+    // Completed Orders
+    const completedOrders = await Order.countDocuments({
+      status: OrderStatus.Delivered,
+    });
+
+    // Total Revenue from Delivered Orders
+    const completedOrdersData = await Order.find({
+      status: OrderStatus.Delivered,
+    });
+    const totalRevenue = completedOrdersData.reduce(
+      (sum, order) => sum + order.totalPrice,
+      0
+    );
+
+    // Calculate Order Completion Rate
+    const orderCompletionRate =
+      totalOrders > 0
+        ? ((completedOrders / totalOrders) * 100).toFixed(2)
+        : "0.00";
+
+    // Calculate Average Order Value (AOV)
+    const averageOrderValue =
+      completedOrders > 0
+        ? (totalRevenue / completedOrders).toFixed(2)
+        : "0.00";
+
+    // Sales Performance by Date
+    const salesData = await Order.aggregate([
+      { $match: { status: OrderStatus.Delivered } },
+      {
+        $group: {
+          _id: { $dateToString: { format: "%Y-%m-%d", date: "$createdAt" } },
+          totalSales: { $sum: "$totalPrice" },
+        },
+      },
+      { $sort: { _id: 1 } },
+    ]);
+
     // Recent Orders (Last 5)
     const recentOrders = await Order.find({})
       .sort({ createdAt: -1 })
@@ -43,6 +81,11 @@ export default async function handler(
       totalOrders,
       pendingOrders,
       recentOrders,
+      completedOrders,
+      totalRevenue,
+      orderCompletionRate,
+      averageOrderValue,
+      salesData,
     });
   } catch (error) {
     console.error("Error fetching dashboard data:", error);
