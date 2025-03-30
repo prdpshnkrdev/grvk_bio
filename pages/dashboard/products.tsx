@@ -1,5 +1,16 @@
-import React, { useState, useEffect } from "react";
-import { Button, Container, Typography } from "@mui/material";
+import React, { useState, useEffect, useCallback } from "react";
+import {
+  Button,
+  Container,
+  Typography,
+  Box,
+  FormControl,
+  InputLabel,
+  MenuItem,
+  Select,
+  TextField,
+  Pagination,
+} from "@mui/material";
 import axios from "axios";
 import AddProductForm from "../../components/AddProductForm";
 import ProductTable from "../../components/ProductTable";
@@ -16,22 +27,40 @@ const ProductsPage = () => {
   const [open, setOpen] = useState(false);
   const [editProduct, setEditProduct] = useState<Product | null>(null);
   const [products, setProducts] = useState<Product[]>([]);
+  const [sortBy, setSortBy] = useState("createdAt");
+  const [order, setOrder] = useState("desc");
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [minPrice, setMinPrice] = useState<string>("");
+  const [maxPrice, setMaxPrice] = useState<string>("");
+  const [inStock, setInStock] = useState<string>("all");
 
   // Fetch Products
-  const fetchProducts = async () => {
+  const fetchProducts = useCallback(async () => {
     try {
-      const response = await axios.get("/api/products");
-      setProducts(response.data);
+      const response = await axios.get("/api/products", {
+        params: {
+          sortBy,
+          order,
+          page,
+          limit: 10,
+          minPrice: minPrice || undefined,
+          maxPrice: maxPrice || undefined,
+          inStock: inStock === "all" ? undefined : inStock === "true",
+        },
+      });
+
+      setProducts(response.data.products);
+      setTotalPages(response.data.totalPages);
     } catch (error) {
       console.error("Error fetching products:", error);
     }
-  };
+  }, [sortBy, order, page, minPrice, maxPrice, inStock]);
 
   useEffect(() => {
     fetchProducts();
-  }, []);
+  }, [sortBy, order, page, minPrice, maxPrice, inStock, fetchProducts]);
 
-  // Add or Edit Product
   const handleSaveProduct = async (
     productData: Omit<Product, "id">,
     productId?: string
@@ -50,7 +79,6 @@ const ProductsPage = () => {
     setEditProduct(null);
   };
 
-  // Delete Product
   const handleDeleteProduct = async (productId: string) => {
     if (!window.confirm("Are you sure you want to delete this product?"))
       return;
@@ -73,13 +101,71 @@ const ProductsPage = () => {
         <Typography variant="h4" gutterBottom>
           Products Management
         </Typography>
-        <Button
-          variant="contained"
-          color="primary"
-          onClick={() => setOpen(true)}
-        >
-          Add Product
-        </Button>
+
+        {/* Sort, Filter, and Pagination Controls */}
+        <Box display="flex" gap={2} marginBottom={2}>
+          {/* Sort Controls */}
+          <FormControl size="small">
+            <InputLabel>Sort By</InputLabel>
+            <Select value={sortBy} onChange={(e) => setSortBy(e.target.value)}>
+              <MenuItem value="name">Name</MenuItem>
+              <MenuItem value="price">Price</MenuItem>
+              <MenuItem value="stock">Stock</MenuItem>
+              <MenuItem value="createdAt">Date Created</MenuItem>
+            </Select>
+          </FormControl>
+
+          <FormControl size="small">
+            <InputLabel>Order</InputLabel>
+            <Select value={order} onChange={(e) => setOrder(e.target.value)}>
+              <MenuItem value="asc">Ascending</MenuItem>
+              <MenuItem value="desc">Descending</MenuItem>
+            </Select>
+          </FormControl>
+
+          {/* Filter Controls */}
+          <TextField
+            label="Min Price"
+            size="small"
+            type="number"
+            value={minPrice}
+            onChange={(e) => setMinPrice(e.target.value)}
+          />
+          <TextField
+            label="Max Price"
+            size="small"
+            type="number"
+            value={maxPrice}
+            onChange={(e) => setMaxPrice(e.target.value)}
+          />
+          <FormControl size="small">
+            <InputLabel>In Stock</InputLabel>
+            <Select
+              value={inStock}
+              onChange={(e) => setInStock(e.target.value)}
+            >
+              <MenuItem value="all">All</MenuItem>
+              <MenuItem value="true">In Stock</MenuItem>
+              <MenuItem value="false">Out of Stock</MenuItem>
+            </Select>
+          </FormControl>
+
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={() => setOpen(true)}
+          >
+            Add Product
+          </Button>
+        </Box>
+
+        {/* Pagination */}
+        <Pagination
+          count={totalPages}
+          page={page}
+          onChange={(_, newPage) => setPage(newPage)}
+        />
+
         <ProductTable
           products={products}
           onEdit={handleEdit}
