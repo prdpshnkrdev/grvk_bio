@@ -3,6 +3,7 @@ import dbConnect from "../../../lib/mongodb"; // Adjust the import path as neces
 import Order, { IOrder, OrderStatus } from "../../../models/Orders";
 import Product from "../../../models/Products"; // Adjust the import path as necessary
 import { NextApiRequest, NextApiResponse } from "next";
+import applyCors from "../../../lib/cors";
 
 // Connect to MongoDB
 dbConnect();
@@ -11,6 +12,7 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
+  await applyCors(req, res);
   const { id } = req.query;
 
   // Validate ID for GET, PUT, DELETE requests

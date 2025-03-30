@@ -2,6 +2,7 @@ import mongoose from "mongoose";
 import dbConnect from "../../../lib/mongodb";
 import Order, { IOrder, OrderStatus } from "../../../models/Orders";
 import { NextApiRequest, NextApiResponse } from "next";
+import applyCors from "../../../lib/cors";
 
 // Connect to MongoDB
 dbConnect();
@@ -10,6 +11,7 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
+  await applyCors(req, res);
   const { id } = req.query;
 
   if (id && !mongoose.Types.ObjectId.isValid(id as string)) {

@@ -1,7 +1,7 @@
-// pages/api/products/[id].ts
 import dbConnect from "../../../lib/mongodb";
 import Product, { IProduct } from "../../../models/Products";
 import { NextApiRequest, NextApiResponse } from "next";
+import applyCors from "../../../lib/cors";
 
 // Connect to MongoDB
 dbConnect();
@@ -10,6 +10,7 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
+  await applyCors(req, res);
   const { id } = req.query;
 
   if (!id) {

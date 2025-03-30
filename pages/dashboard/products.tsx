@@ -56,7 +56,7 @@ const ProductsPage = () => {
     } catch (error) {
       console.error("Error fetching products:", error);
     }
-  }, [sortBy, order, page, minPrice, maxPrice, inStock]);
+  }, [apiUrl, sortBy, order, page, minPrice, maxPrice, inStock]);
 
   useEffect(() => {
     fetchProducts();
