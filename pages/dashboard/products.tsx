@@ -68,25 +68,26 @@ const ProductsPage = () => {
     productId?: string
   ) => {
     try {
-      console.log("Saving Product:", productData, productId);
       if (productId) {
-        await axios.put(`/api/products/${productId}`, productData);
+        await axios.put(`${apiUrl}/products/${productId}`, productData);
       } else {
-        await axios.post("/api/products", productData);
+        await axios.post(`${apiUrl}/products`, productData);
       }
-      fetchProducts();
+
+      await fetchProducts(); // ✅ make sure to wait for it
     } catch (error) {
-      console.error("Error saving product:", error);
+      console.error("Failed to save product:", error);
+      throw error; // ✅ rethrow so the dialog knows it failed
+    } finally {
+      setEditProduct(null);
     }
-    setOpen(false);
-    setEditProduct(null);
   };
 
   const handleDeleteProduct = async (productId: string) => {
     if (!window.confirm("Are you sure you want to delete this product?"))
       return;
     try {
-      await axios.delete(`/api/products/${productId}`);
+      await axios.delete(`${apiUrl}/products/${productId}`);
       fetchProducts();
     } catch (error) {
       console.error("Error deleting product:", error);

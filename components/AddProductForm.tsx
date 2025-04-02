@@ -44,16 +44,22 @@ const AddProductForm: React.FC<AddProductFormProps> = ({
     }
   }, [initialData]);
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (!name || price === "" || stock === "") {
       alert("Please fill all fields");
       return;
     }
-    onSave(
-      { name, price: Number(price), stock: Number(stock) },
-      initialData?._id
-    );
-    onClose();
+
+    try {
+      await onSave(
+        { name, price: Number(price), stock: Number(stock) },
+        initialData?._id
+      );
+      onClose(); // ✅ move this inside `try` after save
+    } catch (error) {
+      console.error("Failed to save product:", error);
+      alert("Something went wrong while saving");
+    }
   };
 
   return (
