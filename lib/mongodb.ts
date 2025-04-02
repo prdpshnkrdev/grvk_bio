@@ -2,7 +2,6 @@
 import mongoose from "mongoose";
 
 const MONGODB_URI = process.env.MONGODB_URI;
-const MONGODB_DB = process.env.MONGODB_DB;
 
 if (!MONGODB_URI) {
   throw new Error(
@@ -28,8 +27,9 @@ async function dbConnect() {
 
   if (!cached.promise) {
     cached.promise = mongoose
-      .connect(MONGODB_URI as string, {
-        dbName: MONGODB_DB,
+      .connect(MONGODB_URI!, {
+        dbName: "grvk-biores",
+        bufferCommands: false,
       })
       .then((mongoose) => mongoose);
   }
