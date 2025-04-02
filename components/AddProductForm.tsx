@@ -9,7 +9,7 @@ import {
 } from "@mui/material";
 
 interface Product {
-  id: string;
+  _id: string;
   name: string;
   price: number;
   stock: number;
@@ -18,7 +18,7 @@ interface Product {
 interface AddProductFormProps {
   open: boolean;
   onClose: () => void;
-  onSave: (product: Omit<Product, "id">, id?: string) => void;
+  onSave: (product: Omit<Product, "_id">, _id?: string) => void;
   initialData?: Product | null;
 }
 
@@ -51,7 +51,7 @@ const AddProductForm: React.FC<AddProductFormProps> = ({
     }
     onSave(
       { name, price: Number(price), stock: Number(stock) },
-      initialData?.id
+      initialData?._id
     );
     onClose();
   };

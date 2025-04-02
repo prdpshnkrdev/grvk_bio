@@ -12,16 +12,16 @@ export default async function handler(
   res: NextApiResponse
 ) {
   await applyCors(req, res);
-  const { id } = req.query;
+  const { _id } = req.query;
 
-  if (id && !mongoose.Types.ObjectId.isValid(id as string)) {
+  if (_id && !mongoose.Types.ObjectId.isValid(_id as string)) {
     return res.status(400).json({ error: "Invalid Order ID" });
   }
   try {
     switch (req.method) {
       // Get Order by ID
       case "GET": {
-        const order: IOrder | null = await Order.findById(id).populate(
+        const order: IOrder | null = await Order.findById(_id).populate(
           "productId"
         );
         if (!order) {
@@ -39,7 +39,7 @@ export default async function handler(
         }
 
         const updatedOrder = await Order.findByIdAndUpdate(
-          id,
+          _id,
           { status },
           { new: true, runValidators: true }
         );
@@ -53,7 +53,7 @@ export default async function handler(
 
       // Delete Order
       case "DELETE": {
-        const deletedOrder = await Order.findByIdAndDelete(id);
+        const deletedOrder = await Order.findByIdAndDelete(_id);
         if (!deletedOrder) {
           return res.status(404).json({ error: "Order not found" });
         }

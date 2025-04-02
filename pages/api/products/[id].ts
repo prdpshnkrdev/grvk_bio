@@ -11,16 +11,16 @@ export default async function handler(
   res: NextApiResponse
 ) {
   await applyCors(req, res);
-  const { id } = req.query;
+  const { _id } = req.query;
 
-  if (!id) {
+  if (!_id) {
     return res.status(400).json({ error: "Product ID is required" });
   }
 
   try {
     switch (req.method) {
       case "GET":
-        const product: IProduct | null = await Product.findById(id);
+        const product: IProduct | null = await Product.findById(_id);
         if (!product)
           return res.status(404).json({ error: "Product not found" });
         return res.status(200).json(product);
@@ -32,7 +32,7 @@ export default async function handler(
         }
 
         const updatedProduct = await Product.findByIdAndUpdate(
-          id,
+          _id,
           { name, price, stock },
           { new: true, runValidators: true }
         );
@@ -42,7 +42,7 @@ export default async function handler(
         return res.status(200).json(updatedProduct);
 
       case "DELETE":
-        const deletedProduct = await Product.findByIdAndDelete(id);
+        const deletedProduct = await Product.findByIdAndDelete(_id);
         if (!deletedProduct)
           return res.status(404).json({ error: "Product not found" });
         return res.status(204).end();

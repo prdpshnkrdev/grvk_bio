@@ -12,7 +12,7 @@ import {
 } from "@mui/material";
 
 interface Product {
-  id: string;
+  _id: string;
   name: string;
   price: number;
   stock: number;
@@ -43,9 +43,9 @@ const ProductTable: React.FC<ProductTableProps> = ({
         </TableHead>
         <TableBody>
           {products.length > 0 ? (
-            products.map((product) => (
-              <TableRow key={product.id}>
-                <TableCell>{product.id}</TableCell>
+            products.map((product, index) => (
+              <TableRow key={product._id}>
+                <TableCell>{index + 1}</TableCell>
                 <TableCell>{product.name}</TableCell>
                 <TableCell>${product.price}</TableCell>
                 <TableCell>{product.stock}</TableCell>
@@ -53,7 +53,7 @@ const ProductTable: React.FC<ProductTableProps> = ({
                   <Button onClick={() => onEdit(product)} color="primary">
                     Edit
                   </Button>
-                  <Button onClick={() => onDelete(product.id)} color="error">
+                  <Button onClick={() => onDelete(product._id)} color="error">
                     Delete
                   </Button>
                 </TableCell>

@@ -17,7 +17,7 @@ import ProductTable from "../../components/ProductTable";
 import DashboardLayout from "../../layouts/DashboardLayout";
 
 interface Product {
-  id: string;
+  _id: string;
   name: string;
   price: number;
   stock: number;
@@ -50,6 +50,7 @@ const ProductsPage = () => {
           inStock: inStock === "all" ? undefined : inStock === "true",
         },
       });
+      console.log("Fetched Products:", response.data.products);
 
       setProducts(response.data.products);
       setTotalPages(response.data.totalPages);
@@ -63,10 +64,11 @@ const ProductsPage = () => {
   }, [sortBy, order, page, minPrice, maxPrice, inStock, fetchProducts]);
 
   const handleSaveProduct = async (
-    productData: Omit<Product, "id">,
+    productData: Omit<Product, "_id">,
     productId?: string
   ) => {
     try {
+      console.log("Saving Product:", productData, productId);
       if (productId) {
         await axios.put(`/api/products/${productId}`, productData);
       } else {

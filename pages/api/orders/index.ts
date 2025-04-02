@@ -13,10 +13,10 @@ export default async function handler(
   res: NextApiResponse
 ) {
   await applyCors(req, res);
-  const { id } = req.query;
+  const { _id } = req.query;
 
   // Validate ID for GET, PUT, DELETE requests
-  if (id && !mongoose.Types.ObjectId.isValid(id as string)) {
+  if (_id && !mongoose.Types.ObjectId.isValid(_id as string)) {
     return res.status(400).json({ error: "Invalid Order ID" });
   }
   try {
