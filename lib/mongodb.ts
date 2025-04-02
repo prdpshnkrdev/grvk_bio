@@ -39,4 +39,8 @@ async function dbConnect() {
   return cached.conn;
 }
 
+mongoose.connection.on("connected", () => {
+  console.log("✅ Connected to MongoDB DB:", mongoose.connection.name);
+});
+
 export default dbConnect;
