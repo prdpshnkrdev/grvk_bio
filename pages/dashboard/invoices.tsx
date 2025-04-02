@@ -1,4 +1,3 @@
-// pages/dashboard/invoices.tsx
 import React from "react";
 import DashboardLayout from "../../layouts/DashboardLayout";
 
